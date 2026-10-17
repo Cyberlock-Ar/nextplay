@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NextPlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --line:#DCE2EC; --text:#14202E; --dim:#586479;
+  --teal:#0A7C6A; --teal-soft:rgba(10,124,106,.10); --on-teal:#FFFFFF; --amber:#A8650A; --guide:#3ED6B8;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151C; --panel:#1A1F2B; --line:#272E3D; --text:#EDEEF2; --dim:#98A1B2;
+    --teal:#3ED6B8; --teal-soft:rgba(62,214,184,.12); --on-teal:#0A1512; --amber:#FFB454; --guide:#3ED6B8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151C; --panel:#1A1F2B; --line:#272E3D; --text:#EDEEF2; --dim:#98A1B2;
+  --teal:#3ED6B8; --teal-soft:rgba(62,214,184,.12); --on-teal:#0A1512; --amber:#FFB454; --guide:#3ED6B8;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.5}
+h1,h2,h3{font-family:'Space Grotesk','Inter',system-ui,sans-serif;letter-spacing:-.01em;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+header{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:var(--bg)}
+header .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 24px;padding-top:10px;padding-bottom:6px}
+.hleft,.hright{display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px}
+.brand img{width:36px;height:36px;object-fit:contain;border-radius:9px}
+nav{display:flex;flex-wrap:wrap;gap:2px}
+nav button{min-height:44px;padding:0 14px;background:none;border:0;border-bottom:3px solid transparent;color:var(--dim);font:inherit;font-weight:500;cursor:pointer}
+nav button[aria-current="page"]{color:var(--text);border-bottom-color:var(--teal)}
+.profile{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--dim);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.profile:hover{border-color:var(--teal);color:var(--text)}
+.profile b{color:var(--text);font-weight:600}
+
+section{padding:36px 0 56px}
+.lead{color:var(--dim);max-width:60ch;margin:10px 0 0}
+.btn{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:var(--on-teal)}
+
+/* lobby */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,320px);gap:18px 28px;align-items:center}
+.hero-art{display:grid;place-items:center;padding:4px}
+.hero-art img{width:100%;max-width:300px;height:auto;opacity:.55;animation:heroGlow 3.2s ease-in-out infinite}
+@keyframes heroGlow{0%,100%{opacity:.5;filter:drop-shadow(0 0 10px rgba(62,214,184,.2))}50%{opacity:1;filter:drop-shadow(0 0 36px rgba(62,214,184,.8))}}
+#lobby h1{font-size:clamp(34px,7vw,56px);line-height:1.05}
+.stat{margin:14px 0 0;color:var(--dim);font-size:13px}
+.statcard{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);max-width:640px}
+.donut{position:relative;flex:0 0 auto;width:84px;height:84px;display:grid;place-items:center}
+.donut svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.donut .dtrack{stroke:var(--line)}
+.donut .dfill{stroke:var(--teal);stroke-linecap:round;stroke-dasharray:7.1 92.9;animation:donutIn 1.2s ease-out both}
+@keyframes donutIn{from{stroke-dasharray:0 100}}
+.donut b{font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--text)}
+.sbars{display:flex;flex:1 1 220px;flex-direction:column;gap:8px;min-width:200px}
+.sbar{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:0;font-size:12px}
+.sbar span{color:var(--text);font-weight:500}
+.sbar b{color:var(--dim);font-weight:600}
+.sbar i{grid-column:1/-1;height:6px;border-radius:99px;background:var(--line);position:relative;overflow:hidden}
+.sbar i::after{content:'';position:absolute;top:0;bottom:0;left:0;width:var(--v);border-radius:inherit;background:linear-gradient(90deg,var(--teal),var(--guide));animation:barIn 1.1s ease-out both}
+@keyframes barIn{from{width:0}}
+.stat-src{margin:10px 0 0;color:var(--dim);font-size:12px}
+
+/* catalogo */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:26px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:168px;display:flex;flex-direction:column;gap:8px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.card.feat{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.card:hover{transform:translateY(-4px);border-color:var(--teal);box-shadow:0 10px 22px rgba(10,20,32,.16)}
+.card:active{transform:translateY(-1px) scale(.985)}
+.card h3{font-size:18px;margin:0}
+.card p{margin:0;color:var(--dim);font-size:14px}
+.card-open{font:inherit;color:var(--text);background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.card-open::after{content:'';position:absolute;inset:0;border-radius:inherit}
+.card-open:focus{outline:none}
+.card-open:focus-visible::after{outline:3px solid var(--amber);outline-offset:-3px}
+.tile-head{display:flex;align-items:flex-start;gap:12px}
+.tile-icon{flex:0 0 auto;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;color:#fff;background:var(--ic,var(--teal))}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
+.tag{font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim);background:var(--panel)}
+.tag.ok{background:var(--teal);border-color:var(--teal);color:var(--on-teal);font-weight:600}
+
+/* ficha de juego + ajustes rapidos */
+.gbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:20px 0 4px}
+.gtags{display:flex;flex-wrap:wrap;gap:6px}
+.qrow{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin:16px 0 20px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.qset{display:flex;align-items:center;gap:8px}
+.qlabel{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.qopts{display:flex;flex-wrap:wrap;gap:4px}
+.qopt{min-height:40px;padding:0 11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+.qopt[aria-checked="true"]{border-color:var(--teal);background:var(--teal-soft);font-weight:600}
+.switch.sm{width:46px;height:28px}
+.switch.sm::after{width:20px;height:20px}
+.switch.sm[aria-checked="true"]::after{transform:translateX(18px)}
+
+/* dialogo de ajustes */
+dialog{width:min(92vw,560px);max-height:86vh;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);box-shadow:0 26px 60px rgba(6,12,20,.4)}
+dialog::backdrop{background:rgba(8,14,22,.6)}
+.dlg-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:20px}
+.dlg-body{padding:4px 18px 20px;overflow:auto;max-height:calc(86vh - 74px)}
+.dlg-body .lead{margin:10px 0 6px}
+.dlg-body .group:first-of-type{border-top:0}
+
+/* juego */
+.hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 10px}
+.score{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px}
+.stage{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#1B2130,#12151C);border:1px solid var(--line);touch-action:manipulation;cursor:pointer;user-select:none;-webkit-user-select:none;
+  --plat:#3ED6B8;--coin:#FFB454}
+.stage[data-mode="protanopia"]{--plat:#4C8DFF;--coin:#FFD23F}
+.stage[data-mode="deuteranopia"]{--plat:#5B9BD5;--coin:#F2C94C}
+.stage[data-mode="tritanopia"]{--plat:#2EC4B6;--coin:#FF5A7A}
+.plat{position:absolute;height:3.2%;min-height:8px;border-radius:5px;background:var(--plat);transition:background .3s}
+.coin{position:absolute;width:5.2%;aspect-ratio:1;border-radius:50%;background:var(--coin);transform:translate(-50%,-50%);transition:transform .25s,opacity .25s,background .3s;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25)}
+.coin.got{opacity:0;transform:translate(-50%,-50%) scale(.2)}
+.goal{position:absolute;width:5%;aspect-ratio:1/1.6;transform:translate(-50%,-50%);border-radius:4px;background:repeating-linear-gradient(45deg,var(--plat) 0 6px,#12151C 6px 11px);border:2px solid var(--plat)}
+.player{position:absolute;width:5.6%;aspect-ratio:1;border-radius:22%;background:#F4F6FA;border:3px solid #12151C;box-shadow:0 0 0 3px #F4F6FA;transform:translate(-50%,-50%);transition:left .35s ease,top .35s ease}
+.wave{position:absolute;left:3%;right:3%;bottom:3%;height:15%;display:flex;align-items:flex-end;gap:3px;opacity:0;transition:opacity .35s;pointer-events:none}
+.wave.on{opacity:1}
+.wave i{flex:1;min-width:2px;border-radius:3px;background:var(--coin);opacity:.85;height:20%;animation:bar 1.2s ease-in-out infinite;transition:background .3s}
+.wave.ping i{animation-duration:.45s}
+.wave.err i{background:#FF5A5F;opacity:1;animation:buzz .16s linear infinite}
+@keyframes bar{0%,100%{height:15%}50%{height:100%}}
+@keyframes buzz{0%,100%{height:8%}50%{height:24%}}
+.status{min-height:26px;margin:12px 0 0;color:var(--dim)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.big{min-height:64px;flex:1 1 240px;font-size:18px}
+
+/* guia visual */
+.beacon{position:absolute;width:14%;aspect-ratio:1;pointer-events:none;transform:translate(-50%,-50%);transition:left .35s ease,top .35s ease,transform .35s ease;user-select:none;-webkit-user-select:none}
+.beacon::before{content:'';position:absolute;top:50%;left:50%;width:50%;height:0;border-top:3px dotted var(--guide);transform:translateY(-50%)}
+.beacon::after{content:'';position:absolute;top:50%;left:100%;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:15px solid var(--guide);transform:translate(-50%,-50%);filter:drop-shadow(0 0 3px rgba(0,0,0,.55))}
+.coin.target,.goal.target{outline:3px solid var(--guide);animation:halo 1.5s ease-in-out infinite}
+@keyframes halo{0%,100%{outline-offset:2px}50%{outline-offset:10px}}
+.sound+.sound{margin-top:16px}
+
+/* simulador de daltonismo (demo para clase) */
+html[data-sim="protanopia"]{filter:url(#sim-protanopia)}
+html[data-sim="deuteranopia"]{filter:url(#sim-deuteranopia)}
+html[data-sim="tritanopia"]{filter:url(#sim-tritanopia)}
+
+/* ajustes */
+.group{border-top:1px solid var(--line);padding:18px 0}
+.group h3{font-size:16px;margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:6px;max-width:460px}
+.opt{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.opt[aria-checked="true"]{border-color:var(--teal);background:var(--teal-soft)}
+.opt .sw{display:flex;gap:3px;margin-left:auto}
+.opt .sw i{width:16px;height:16px;border-radius:50%;display:block}
+.sound{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:460px}
+.sound p{margin:0}.sound small{color:var(--dim)}
+.switch{width:54px;height:32px;border-radius:99px;border:1px solid var(--line);background:var(--line);position:relative;cursor:pointer;flex-shrink:0;padding:0}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--dim);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--teal-soft);border-color:var(--teal)}
+.switch[aria-checked="true"]::after{transform:translateX(22px);background:var(--teal)}
+.cue{aspect-ratio:16/7;border-radius:14px;background:linear-gradient(180deg,#1B2130,#12151C);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background-color .15s}
+.cue.flash-izq{background-color:#2A4D8F}
+.cue.flash-der{background-color:#8F6B2A}
+.cue.flash-saltar{background-color:#2A8F6B}
+.cue.flash-fail{background-color:#8F2A2A}
+.cue b{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,4vw,30px);color:#F4F6FA;text-align:center;padding:0 16px}
+.timer-bar{height:8px;border-radius:99px;background:var(--line);margin-top:12px;overflow:hidden}
+.timer-fill{height:100%;background:var(--teal);width:100%;transform-origin:left}
+.timer-fill.run{transition:width linear}
+.eco-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+.eco-btns button{min-height:64px}
+.eco-score{display:flex;gap:18px;margin-top:14px;color:var(--dim);font-size:14px}
+.eco-score b{color:var(--text);font-family:'Space Grotesk',sans-serif}
+
+/* ritmo visual */
+.rpad-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:470px;margin:18px auto 0}
+.rpad{position:relative;min-height:118px;border-radius:16px;border:2px solid var(--line);background:var(--panel);color:var(--text);font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;transition:background .16s,transform .12s,border-color .16s}
+.rpad .glyph{font-size:36px;line-height:1;color:var(--teal)}
+.rpad .rname{font-size:13px;color:var(--dim)}
+.rpad.on{background:var(--teal-soft);border-color:var(--teal);transform:scale(1.04)}
+.rpad.hit{background:var(--teal-soft);border-color:var(--teal)}
+.rpad.bad{border-color:#FF5A5F;background:rgba(255,90,95,.14)}
+.rpad:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.rpad.sel{outline:3px solid var(--amber);outline-offset:3px;border-color:var(--amber)}
+.rhint{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;color:var(--dim);font-size:14px;margin:14px 0 0}
+
+/* caza del sonido */
+.caza-obj{position:absolute;width:5.4%;aspect-ratio:1;border-radius:50%;background:var(--coin);transform:translate(-50%,-50%);opacity:0;transition:opacity .3s,background .3s;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25)}
+.caza-obj.found{opacity:1;outline:3px solid var(--guide);outline-offset:4px}
+.radar{position:absolute;width:15%;aspect-ratio:1;border-radius:50%;border:3px solid var(--guide);transform:translate(-50%,-50%);opacity:0;pointer-events:none}
+.radar.ping{animation:radar .6s ease-out}
+@keyframes radar{0%{opacity:.85;transform:translate(-50%,-50%) scale(.45)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
+
+/* un boton, un mundo */
+.bworld{position:relative;height:130px;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px;background:linear-gradient(180deg,#1B2130,#12151C);touch-action:manipulation;cursor:pointer;
+  --plat:#3ED6B8;--coin:#FFB454}
+.bworld[data-mode="protanopia"]{--plat:#4C8DFF;--coin:#FFD23F}
+.bworld[data-mode="deuteranopia"]{--plat:#5B9BD5;--coin:#F2C94C}
+.bworld[data-mode="tritanopia"]{--plat:#2EC4B6;--coin:#FF5A7A}
+.bground{position:absolute;left:0;right:0;bottom:0;height:34%;background:rgba(255,255,255,.05);border-top:2px solid var(--line)}
+.btrack{position:absolute;left:0;bottom:34%;height:0;will-change:transform}
+.bobs{position:absolute;bottom:0;width:18px;border-radius:7px 7px 0 0;background:var(--plat);transform:translateX(-50%);box-shadow:0 0 0 2px rgba(0,0,0,.4)}
+.bflag{position:absolute;bottom:0;width:9px;height:48px;background:repeating-linear-gradient(45deg,var(--coin) 0 5px,transparent 5px 10px);border:2px solid var(--coin);transform:translateX(-50%)}
+.bhero{position:absolute;left:8%;bottom:41px;width:34px;height:34px;border-radius:10px;background:#F4F6FA;border:3px solid #12151C;box-shadow:0 0 0 3px #F4F6FA;transition:background .15s}
+.bhero.jump{background:var(--guide)}
+.bhero.dead{background:#FF5A5F;box-shadow:0 0 0 3px #FF5A5F}
+footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-size:13px}
+@media (max-width:700px){.hero{grid-template-columns:1fr}.hero-art{order:-1;justify-items:start}.hero-art img{max-width:170px}}
+@media (max-width:560px){.profile{width:100%;justify-content:flex-start}.qrow{padding:12px}.tile-icon{width:40px;height:40px;font-size:19px}.brand img{width:30px;height:30px}}
+@media (prefers-reduced-motion:reduce){.player,.coin,.switch::after,.beacon{transition:none}.wave i{animation:none;height:50%}.wave.err i{height:12%}.coin.target,.goal.target{animation:none}.brand img{animation:none}.hero-art img{animation:none;opacity:.75}}
+@media (prefers-reduced-motion:reduce){.rpad,.bhero,.caza-obj{transition:none}.radar.ping{animation:none}.card{transition:none}.hero-art img{animation:none;opacity:.75}.donut .dfill,.sbar i::after{animation:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="hleft">
+    <div class="brand"><img src="logo.png" alt="" width="36" height="36" decoding="async">NextPlay</div>
+    <nav aria-label="Secciones">
+      <button data-go="lobby" aria-current="page">Juegos</button>
+      <button data-go="ajustes">Ajustes</button>
+    </nav>
+  </div>
+  <div class="hright">
+    <button class="profile" data-go="ajustes" aria-label="Abrir los ajustes de accesibilidad">
+      <span id="profileTxt">Estándar · sin sonido · sin voz</span><span aria-hidden="true">⚙</span>
+    </button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<section id="lobby">
+  <div class="hero">
+    <div class="hero-txt">
+      <h1>NextPlay</h1>
+      <p class="lead">Elige cómo ves, cómo escuchas y cómo controlas: el juego se configura antes de empezar. Muevete con las flechas del teclado y abre con Enter, o haz clic en la tarjeta que quieras.</p>
+      <p class="stat">En Colombia hay más de 3 millones de personas con dificultades para realizar actividades básicas diarias (DANE).</p>
+      <div class="statcard">
+        <div class="donut" role="img" aria-label="El 7,1 por ciento de la población colombiana tiene dificultades para realizar actividades diarias">
+          <svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle></svg>
+          <b>7,1%</b>
+        </div>
+        <div class="sbars">
+          <p class="sbar"><span>Ver de cerca o de lejos</span><b>56,6%</b><i style="--v:56.6%"></i></p>
+          <p class="sbar"><span>Mover el cuerpo o caminar</span><b>31,0%</b><i style="--v:31%"></i></p>
+          <p class="sbar"><span>Oír voces o sonidos</span><b>15,8%</b><i style="--v:15.8%"></i></p>
+        </div>
+      </div>
+      <p class="stat-src">Dificultades más frecuentes sobre personas con discapacidad. Fuente: DANE, CNPV 2018 y ECV.</p>
+    </div>
+    <div class="hero-art"><img src="logo.png" alt="" width="300" height="300" decoding="async"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="status" id="catStatus" role="status" aria-live="polite"></p>
+</section>
+
+<section id="jugar" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Daltonismo</span><span class="tag">Motriz</span><span class="tag">Sonido</span></div>
+  </div>
+  <h2>Salto de Colores</h2>
+  <p class="lead">Toca la pantalla o usa las flechas del teclado para mover al jugador. Recoge todas las monedas y llega a la meta rayada.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="score">Monedas 0 / 4</div>
+    <button class="btn" id="reset">Reiniciar</button>
+  </div>
+  <div class="stage" id="stage" data-mode="default" tabindex="0" role="application" aria-label="Escenario del juego. Toca o usa las flechas para mover al jugador."></div>
+  <p class="status" id="status" role="status" aria-live="polite">Toca el escenario para empezar.</p>
+  <div class="tools">
+    <button class="btn primary big" id="oneBtn" hidden>Avanzar al siguiente objetivo</button>
+    <button class="btn" id="hint">Escuchar pista</button>
+  </div>
+</section>
+
+<section id="eco" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Ceguera</span><span class="tag">Baja visión</span><span class="tag">Atención</span></div>
+  </div>
+  <h2>Eco</h2>
+  <p class="lead">Espera la señal de sonido y pulsa el botón correcto antes de que se acabe el tiempo: izquierda, derecha o saltar. Con teclado: ← izquierda, → derecha y ↑ o espacio para saltar.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="ecoScore">Aciertos 0 / 0</div>
+    <button class="btn" id="ecoReset">Reiniciar</button>
+  </div>
+  <div class="group" style="border-top:0;padding-top:0">
+    <h3 style="font-size:13px;color:var(--dim);font-weight:600">Ritmo (tiempo para responder)</h3>
+    <div style="display:flex;align-items:center;gap:14px;max-width:460px">
+      <input type="range" id="ecoSpeed" min="700" max="2800" step="100" value="1800" style="flex:1" aria-label="Tiempo para responder en milisegundos">
+      <span id="ecoSpeedLabel" style="min-width:52px;font-weight:600">1.8 s</span>
+    </div>
+  </div>
+  <div class="cue" id="cue"><b id="cueText">Pulsa "Empezar" cuando estés listo.</b></div>
+  <div class="timer-bar"><div class="timer-fill" id="ecoTimer"></div></div>
+  <div class="eco-btns">
+    <button class="btn big" id="ecoIzq" aria-label="Izquierda">◀ Izquierda</button>
+    <button class="btn primary big" id="ecoStart">Empezar</button>
+    <button class="btn big" id="ecoDer" aria-label="Derecha">Derecha ▶</button>
+  </div>
+  <div class="eco-btns" style="grid-template-columns:1fr">
+    <button class="btn big" id="ecoSalto" aria-label="Saltar">⤒ Saltar</button>
+  </div>
+  <p class="status" id="ecoStatus" role="status" aria-live="polite"></p>
+  <div class="eco-score">
+    <span>Racha actual: <b id="ecoStreak">0</b></span>
+    <span>Mejor racha: <b id="ecoBest">0</b></span>
+  </div>
+</section>
+
+<section id="ritmo" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Sordera</span><span class="tag">Hipoacusia</span><span class="tag">Memoria</span></div>
+  </div>
+  <h2>Ritmo Visual</h2>
+  <p class="lead">Mira la secuencia de pads y repítela. Los cuatro se distinguen por su <b>forma</b>, nunca por su color, y cada acierto vibra y se enciende: el audio es opcional.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="ritmoScore">Nivel 0 · Paso 0 / 0</div>
+    <button class="btn" id="ritmoStart">Empezar</button>
+  </div>
+  <div class="rpad-wrap" id="ritmoPad" role="group" aria-label="Pads de ritmo"></div>
+  <div class="tools">
+    <button class="btn primary big" id="ritmoOne" hidden>Siguiente pad · mantén para elegir</button>
+  </div>
+  <p class="rhint"><span>Teclas 1-4</span><span>o Tabulador + Intro</span><span>Vibración en móvil</span></p>
+  <p class="status" id="ritmoStatus" role="status" aria-live="polite">Pulsa Empezar cuando estés listo.</p>
+</section>
+
+<section id="caza" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Ceguera</span><span class="tag">Baja visión</span><span class="tag">Sonido</span></div>
+  </div>
+  <h2>Caza del Sonido</h2>
+  <p class="lead">Hay 5 objetos escondidos en la oscuridad. El único mapa es el sonido: sube de tono y se acerca a un oído cuanto más cerca estés. Toca dónde moverte, o usa las flechas.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="cazaScore">Objetos 0 / 5</div>
+    <button class="btn" id="cazaReset">Reiniciar</button>
+  </div>
+  <div class="stage" id="cazaStage" data-mode="default" tabindex="0" role="application" aria-label="Escenario de caza. Toca o usa las flechas para moverte; el tono te guía hacia el objeto más cercano."></div>
+  <p class="status" id="cazaStatus" role="status" aria-live="polite">Toca el escenario para empezar la caza.</p>
+  <div class="tools">
+    <button class="btn primary big" id="cazaOne" hidden>Avanzar hacia el sonido</button>
+    <button class="btn" id="cazaHint">Escuchar pista</button>
+  </div>
+</section>
+
+<section id="boton" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Motriz</span><span class="tag">Un botón</span></div>
+  </div>
+  <h2>Un Botón, Un Mundo</h2>
+  <p class="lead">Corres solo: <b>mantén pulsado</b> el botón (o la barra espaciadora) para saltar cuanto más tiempo lo sostengas. Supera los tres niveles sin más controles.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="botonScore">Nivel 1 / 3</div>
+    <button class="btn" id="botonReset">Reiniciar nivel</button>
+  </div>
+  <div class="bworld" id="botonWorld" data-mode="default" role="application" tabindex="0" aria-label="Mundo del corredor. Mantén espacio, Intro o el botón para saltar.">
+    <div class="bground"></div>
+    <div class="btrack" id="botonTrack"></div>
+    <div class="bhero" id="bhero"></div>
+  </div>
+  <div class="tools">
+    <button class="btn primary big" id="botonJump">Mantén para saltar</button>
+  </div>
+  <p class="status" id="botonStatus" role="status" aria-live="polite">Pulsa y mantén el botón para empezar a correr.</p>
+</section>
+
+</main>
+
+<dialog id="ajustes" aria-labelledby="ajustesTitle">
+  <div class="dlg-head">
+    <h2 id="ajustesTitle">Accesibilidad</h2>
+    <form method="dialog"><button class="btn" value="cerrar">Cerrar</button></form>
+  </div>
+  <div class="dlg-body">
+    <p class="lead">Los cambios se aplican al instante, también dentro del juego.</p>
+    <div class="group"><h3>Modo de color</h3>
+      <div class="opts" id="modes" role="radiogroup" aria-label="Modo de color"></div></div>
+    <div class="group"><h3>Sonido</h3>
+      <div class="sound"><div><p>Pistas de sonido</p><small>Tono más agudo cuanto más cerca del objetivo; suena a izquierda o derecha según su posición.</small></div>
+      <button class="switch sw-audio" data-toggle="audio" role="switch" aria-checked="false" aria-label="Pistas de sonido"></button></div>
+      <div class="sound"><div><p>Narración por voz</p><small>Lee en voz alta el estado del juego, las instrucciones y los resultados, sin depender de la pantalla.</small></div>
+      <button class="switch sw-voice" data-toggle="voice" role="switch" aria-checked="false" aria-label="Narración por voz"></button></div></div>
+    <div class="group"><h3>Control</h3>
+      <div class="opts" id="controls" role="radiogroup" aria-label="Esquema de control"></div></div>
+    <div class="group"><h3>Demostración</h3>
+      <div class="sound"><div><p>Simular daltonismo</p><small>Filtra toda la página con la paleta estándar para que se vea el problema; al apagarlo aparece la paleta segura, es decir, la solución. Con el modo Estándar se simula protanopia.</small></div>
+      <button class="switch sw-sim" data-toggle="sim" role="switch" aria-checked="false" aria-label="Simular daltonismo en toda la página"></button></div></div>
+  </div>
+</dialog>
+<footer><div class="wrap">NextPlay · Prototipo del Corte 1</div></footer>
+
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <filter id="sim-protanopia" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0"/>
+  </filter>
+  <filter id="sim-deuteranopia" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
+  </filter>
+  <filter id="sim-tritanopia" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0"/>
+  </filter>
+</svg>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const state={mode:'default',audio:false,control:'toque',voice:false,sim:false};
+const MODES=[['default','Estándar',['#3ED6B8','#FFB454']],['protanopia','Protanopia',['#4C8DFF','#FFD23F']],['deuteranopia','Deuteranopia',['#5B9BD5','#F2C94C']],['tritanopia','Tritanopia',['#2EC4B6','#FF5A7A']]];
+const CONTROLS=[['toque','Toque o flechas del teclado'],['boton','Un solo botón grande']];
+const GAMES=[
+ ['Salto de Colores','Recoge monedas y llega a la meta con paletas seguras para daltonismo y control táctil.',['Daltonismo','Motriz','Sonido'],'jugar','#0A7C6A'],
+ ['Eco','Escucha la señal y pulsa el botón correcto: izquierda, derecha o saltar.',['Ceguera','Baja visión','Atención'],'eco','#2F5D8F'],
+ ['Un Botón, Un Mundo','Corredor con gravedad que se juega con un único botón: mantén pulsado para saltar.',['Motriz','Un botón'],'boton','#6B4E9B'],
+ ['Ritmo Visual','Secuencias de pads que se distinguen por su forma, con luz y vibración en lugar de audio.',['Sordera','Hipoacusia'],'ritmo','#1F6F8B'],
+ ['Caza del Sonido','Encuentra 5 objetos escondidos guiándote solo por el tono y su posición en el oído.',['Ceguera','Baja visión','Sonido'],'caza','#0A7C6A'],
+ ['Laberinto de Voz','Guía al personaje por el laberinto con comandos de voz.',['Motriz','Voz'],false,'#8A3D5B'],
+ ['Pintura de Patrones','Combina colores con texturas y formas, no solo con tonos.',['Daltonismo'],false,'#A8650A']];
+// false = en diseño
+
+/* navegación */
+const LOBBY='lobby';
+const stopFns=[];
+function onStop(f){stopFns.push(f)}
+function stopGames(){stopFns.forEach(f=>{try{f()}catch(e){}})}
+function go(id){
+  stopGames();
+  $$('main section').forEach(s=>s.hidden=s.id!==id);
+  const enJuegos=[LOBBY,'jugar','eco','ritmo','caza','boton'].includes(id);
+  $$('nav [data-go]').forEach(b=>b.setAttribute('aria-current',(b.dataset.go===id||(b.dataset.go===LOBBY&&enJuegos))?'page':'false'));
+  window.scrollTo(0,0);
+}
+function openSettings(){const d=$('#ajustes');if(d.open)return;d.showModal()}
+function toggle(k){
+  state[k]=!state[k];refresh();
+  if(k==='audio')tone(660,.15);
+  if(k==='voice'){if(state.voice)speak('Narración activada');else mute()}
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){if(g.dataset.go==='ajustes')openSettings();else go(g.dataset.go);return}
+  const m=e.target.closest('[data-mode]');
+  if(m){state.mode=m.dataset.mode;refresh();return}
+  const c=e.target.closest('[data-control]');
+  if(c){state.control=c.dataset.control;refresh();return}
+  const t=e.target.closest('[data-toggle]');
+  if(t)toggle(t.dataset.toggle);
+});
+$('#ajustes').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
+$('nav').addEventListener('keydown',e=>{
+  const b=$$('nav button'),i=b.indexOf(document.activeElement);
+  if(i<0)return;
+  let n=null;
+  if(e.key==='ArrowRight')n=(i+1)%b.length;
+  else if(e.key==='ArrowLeft')n=(i-1+b.length)%b.length;
+  else if(e.key==='Home')n=0;
+  else if(e.key==='End')n=b.length-1;
+  if(n===null)return;
+  e.preventDefault();b[n].focus();b[n].click();
+});
+
+/* catálogo estilo Friv */
+$('#grid').innerHTML=GAMES.map(([n,d,t,to,ic],i)=>`<article class="card${to?' feat':''}">
+  <div class="tile-head"><span class="tile-icon" style="--ic:${ic}" aria-hidden="true">${n[0]}</span>
+  <h3><button type="button" class="card-open"${to?` data-go="${to}"`:' aria-disabled="true"'} tabindex="${i?'-1':'0'}" aria-label="${n}. ${to?'Jugable ahora.':'En diseño, todavía no se puede jugar.'}">${n}</button></h3></div>
+  <p>${d}</p>
+  <div class="tags">${t.map(x=>`<span class="tag">${x}</span>`).join('')}<span class="tag ${to?'ok':''}">${to?'Jugar':'En diseño'}</span></div>
+</article>`).join('');
+
+function cards(){return $$('#grid .card-open')}
+function focusCard(i){
+  const t=cards();if(!t.length)return;
+  i=Math.max(0,Math.min(t.length-1,i));
+  t.forEach(b=>b.tabIndex=-1);t[i].tabIndex=0;t[i].focus();
+}
+$('#grid').addEventListener('keydown',e=>{
+  const t=cards(),i=t.indexOf(document.activeElement);
+  if(i<0)return;
+  const cols=Math.max(1,getComputedStyle($('#grid')).gridTemplateColumns.split(' ').filter(Boolean).length);
+  let n=null;
+  if(e.key==='ArrowRight')n=(i+1)%t.length;
+  else if(e.key==='ArrowLeft')n=(i-1+t.length)%t.length;
+  else if(e.key==='ArrowDown')n=Math.min(t.length-1,i+cols);
+  else if(e.key==='ArrowUp')n=Math.max(0,i-cols);
+  else if(e.key==='Home')n=0;
+  else if(e.key==='End')n=t.length-1;
+  if(n===null)return;
+  e.preventDefault();focusCard(n);
+});
+$('#grid').addEventListener('click',e=>{
+  const b=e.target.closest('.card-open');
+  if(!b||b.dataset.go)return;
+  const msg=b.textContent.trim()+' todavía está en diseño: no se puede jugar todavía.';
+  $('#catStatus').textContent=msg;speak(msg);
+});
+
+/* ajustes del diálogo + ajustes rápidos de cada juego */
+$('#modes').innerHTML=MODES.map(([k,n,c])=>`<button class="opt" role="radio" data-mode="${k}" aria-checked="${k==='default'}">${n}<span class="sw"><i style="background:${c[0]}"></i><i style="background:${c[1]}"></i></span></button>`).join('');
+$('#controls').innerHTML=CONTROLS.map(([k,n])=>`<button class="opt" role="radio" data-control="${k}" aria-checked="${k==='toque'}">${n}</button>`).join('');
+function quickHTML(q){
+  return `<div class="qrow" role="group" aria-label="Ajustes rápidos">
+  <div class="qset"><span class="qlabel" id="qc${q}">Color</span>
+    <div class="qopts" role="radiogroup" aria-labelledby="qc${q}">${MODES.map(([k,n])=>`<button type="button" class="qopt" role="radio" data-mode="${k}" aria-checked="${k==='default'}">${n}</button>`).join('')}</div></div>
+  <div class="qset"><span class="qlabel">Sonido</span>
+    <button type="button" class="switch sm sw-audio" data-toggle="audio" role="switch" aria-checked="false" aria-label="Pistas de sonido"></button>
+    <span class="qlabel">Voz</span>
+    <button type="button" class="switch sm sw-voice" data-toggle="voice" role="switch" aria-checked="false" aria-label="Narración por voz"></button></div>
+  <div class="qset"><span class="qlabel" id="qn${q}">Control</span>
+    <div class="qopts" role="radiogroup" aria-labelledby="qn${q}">${CONTROLS.map(([k,n])=>`<button type="button" class="qopt" role="radio" data-control="${k}" aria-checked="${k==='toque'}" aria-label="${n}">${k==='toque'?'Toque':'1 botón'}</button>`).join('')}</div></div>
+  <button type="button" class="btn" data-go="ajustes">⚙ Más ajustes</button>
+</div>`;
+}
+$$('[data-quick]').forEach((el,i)=>{el.innerHTML=quickHTML(i)});
+
+function refresh(){
+  const simKey=state.sim?(state.mode==='default'?'protanopia':state.mode):'';
+  if(simKey)document.documentElement.dataset.sim=simKey;else delete document.documentElement.dataset.sim;
+  $$('.stage,.bworld').forEach(s=>s.dataset.mode=state.sim?'default':state.mode);
+  $$('.opt[data-mode],.qopt[data-mode]').forEach(b=>b.setAttribute('aria-checked',b.dataset.mode===state.mode));
+  $$('.opt[data-control],.qopt[data-control]').forEach(b=>b.setAttribute('aria-checked',b.dataset.control===state.control));
+  $$('.sw-audio').forEach(b=>b.setAttribute('aria-checked',state.audio));
+  $$('.sw-voice').forEach(b=>b.setAttribute('aria-checked',state.voice));
+  $$('.sw-sim').forEach(b=>b.setAttribute('aria-checked',state.sim));
+  const w=$('#wave');if(w)w.classList.toggle('on',state.audio);
+  $('#oneBtn').hidden=state.control!=='boton';
+  const c1=$('#cazaOne');if(c1)c1.hidden=state.control!=='boton';
+  const r1=$('#ritmoOne');if(r1)r1.hidden=state.control!=='boton';
+  const m=MODES.find(x=>x[0]===state.mode)[1];
+  $('#profileTxt').innerHTML=`<b>${m}</b> · ${state.audio?'con sonido':'sin sonido'} · ${state.voice?'con voz':'sin voz'}${state.sim?' · demo':''}`;
+}
+
+/* sonido */
+let ac;
+function tone(f,d=.15,pan=0,type='sine',delay=0,vol=.25){
+  if(!state.audio)return;
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended')ac.resume();
+  const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;
+  o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.005,vol),t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);
+  if(ac.createStereoPanner){const p=ac.createStereoPanner();p.pan.value=pan;g.connect(p);p.connect(ac.destination)}else g.connect(ac.destination);
+  o.start(t);o.stop(t+d+.05);
+  const w=$('#wave');if(w){w.classList.add('ping');clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove('ping'),700)}
+}
+
+/* narrador por voz */
+let sv=null;
+const HAS_TTS=typeof window!=='undefined'&&'speechSynthesis' in window;
+function pickVoice(){
+  if(!HAS_TTS)return;
+  const vs=speechSynthesis.getVoices()||[];
+  sv=vs.find(v=>/^es[-_]?CO/i.test(v.lang))||vs.find(v=>/^es[-_]/i.test(v.lang))||vs.find(v=>/^es/i.test(v.lang))||null;
+}
+function speak(t){
+  if(!state.voice||!HAS_TTS||!t)return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang=(sv&&sv.lang)||'es-CO';
+    if(sv)u.voice=sv;
+    u.rate=1.05;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function mute(){if(HAS_TTS)try{speechSynthesis.cancel()}catch(e){}}
+if(HAS_TTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+
+/* juego */
+const stage=$('#stage');
+const PLATS=[[5,78,22],[33,55,20],[60,72,24],[84,76,12]];
+const START={x:10,y:68}, GOAL={x:90,y:64};
+let coins=[{x:16,y:66},{x:43,y:43},{x:60,y:26},{x:72,y:60}].map(c=>({...c,got:false}));
+let pos={...START};
+stage.innerHTML=PLATS.map(([l,t,w])=>`<div class="plat" style="left:${l}%;top:${t}%;width:${w}%"></div>`).join('')+
+  coins.map((c,i)=>`<div class="coin" id="c${i}" style="left:${c.x}%;top:${c.y}%"></div>`).join('')+
+  `<div class="goal" style="left:${GOAL.x}%;top:${GOAL.y}%"></div><div class="beacon" id="beacon" aria-hidden="true"></div><div class="player" id="pl" style="left:${pos.x}%;top:${pos.y}%"></div>`+
+  `<div class="wave" id="wave" aria-hidden="true">${Array.from({length:32},(_,i)=>`<i style="animation-delay:-${((i*37%11)/10).toFixed(1)}s"></i>`).join('')}</div>`;
+const pl=$('#pl'), say=t=>{$('#status').textContent=t;speak(t)};
+const dist=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*.625);
+const left=()=>coins.filter(c=>!c.got);
+function nextTarget(){const r=left();return r.length?r.reduce((a,b)=>dist(pos,a)<=dist(pos,b)?a:b):GOAL}
+function guide(){
+  const t=nextTarget(),b=$('#beacon');
+  if(b){
+    b.style.left=pos.x+'%';b.style.top=pos.y+'%';
+    b.style.transform='translate(-50%,-50%) rotate('+(Math.atan2((t.y-pos.y)/1.6,t.x-pos.x)*180/Math.PI).toFixed(1)+'deg)';
+  }
+  $$('.target').forEach(el=>el.classList.remove('target'));
+  const el=t===GOAL?$('.goal'):$('#c'+coins.indexOf(t));
+  if(el)el.classList.add('target');
+}
+function where(t){
+  const dx=t.x-pos.x,dy=t.y-pos.y,p=[];
+  if(dy<-8)p.push('arriba');else if(dy>8)p.push('abajo');
+  if(dx>8)p.push('a la derecha');else if(dx<-8)p.push('a la izquierda');
+  return p.length?p.join(' y '):'muy cerca';
+}
+function cue(){
+  const t=nextTarget(),d=dist(pos,t);
+  tone(Math.max(300,880-Math.min(d,90)*6),.28,Math.max(-1,Math.min(1,(t.x-pos.x)/40)),'triangle');
+  say((left().length?'Siguiente moneda: ':'La meta está: ')+where(t)+'.');
+}
+function move(x,y){
+  pos={x:Math.max(4,Math.min(96,x)),y:Math.max(6,Math.min(94,y))};
+  pl.style.left=pos.x+'%';pl.style.top=pos.y+'%';
+  guide();
+  setTimeout(arrive,380);
+}
+function arrive(){
+  let hit=false;
+  coins.forEach((c,i)=>{if(!c.got&&dist(pos,c)<7){c.got=true;hit=true;$('#c'+i).classList.add('got');tone(660,.12);tone(880,.18,0,'sine',.1)}});
+  const n=coins.length-left().length;
+  $('#score').textContent=`Monedas ${n} / ${coins.length}`;
+  guide();
+  if(dist(pos,GOAL)<8){
+    if(!left().length){say('¡Llegaste a la meta! Ganaste.');[523,659,784,1047].forEach((f,i)=>tone(f,.2,0,'sine',i*.12));return}
+    say(`Aún faltan ${left().length} monedas.`);tone(200,.25,0,'square');
+    const w=$('#wave');w.classList.add('err');clearTimeout(w._e);w._e=setTimeout(()=>w.classList.remove('err'),1300);return;
+  }
+  if(hit)say(n===coins.length?'¡Tienes todas las monedas! Ve a la meta rayada.':`¡Moneda! Llevas ${n} de ${coins.length}.`);
+  else if(state.audio)cue();
+  else say('Sigue explorando.');
+}
+stage.addEventListener('pointerdown',e=>{
+  if(state.control!=='toque')return;
+  const r=stage.getBoundingClientRect();
+  move((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100);
+});
+stage.addEventListener('keydown',e=>{
+  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-14],ArrowDown:[0,14]}[e.key];
+  if(k&&state.control==='toque'){e.preventDefault();move(pos.x+k[0],pos.y+k[1])}
+});
+$('#oneBtn').addEventListener('click',()=>{const t=nextTarget();move(t.x,t.y)});
+$('#hint').addEventListener('click',()=>{if(!state.audio)say('Activa las pistas de sonido en Accesibilidad. Mientras tanto: '+(left().length?'siguiente moneda ':'la meta está ')+where(nextTarget())+'.');else cue()});
+$('#reset').addEventListener('click',()=>{
+  coins.forEach((c,i)=>{c.got=false;$('#c'+i).classList.remove('got')});
+  pos={...START};pl.style.left=pos.x+'%';pl.style.top=pos.y+'%';guide();
+  $('#score').textContent=`Monedas 0 / ${coins.length}`;say('Juego reiniciado. Toca el escenario para empezar.');
+});
+
+/* juego Eco: sonido + atención */
+const eco={cue:null,playing:false,hits:0,tries:0,streak:0,best:0,timeout:null,duration:1800};
+const cueTxt={izq:'Izquierda',der:'Derecha',saltar:'Saltar'};
+function setCue(t){$('#cueText').textContent=t;speak(t)}
+function ecoSay(t){$('#ecoStatus').textContent=t;speak(t)}
+function playCue(cue){
+  if(cue==='izq'){tone(587,.16,-1,'triangle');tone(440,.22,-1,'triangle',.17)}
+  else if(cue==='der'){tone(440,.16,1,'triangle');tone(587,.22,1,'triangle',.17)}
+  else{tone(523,.1,0,'square');tone(659,.1,0,'square',.1);tone(784,.2,0,'square',.2)}
+}
+$('#ecoSpeed').addEventListener('input',e=>{
+  eco.duration=+e.target.value;
+  $('#ecoSpeedLabel').textContent=(eco.duration/1000).toFixed(1)+' s';
+});
+function ecoRound(){
+  clearTimeout(eco.timeout);
+  $('#cue').className='cue';
+  eco.cue=['izq','der','saltar'][Math.floor(Math.random()*3)];
+  $('#cueText').textContent='Escuchando…';
+  $('#ecoStatus').textContent='';
+  const fill=$('#ecoTimer');fill.classList.remove('run');fill.style.transition='none';fill.style.width='100%';
+  const wait=500+Math.random()*500;
+  eco.timeout=setTimeout(()=>{
+    playCue(eco.cue);
+    $('#cue').classList.add('flash-'+eco.cue);
+    setCue(cueTxt[eco.cue]+'…');
+    requestAnimationFrame(()=>{fill.classList.add('run');fill.style.transition=`width ${eco.duration}ms linear`;fill.style.width='0%'});
+    eco.timeout=setTimeout(()=>ecoResult(false),eco.duration);
+  },wait);
+}
+function ecoResult(ok,picked){
+  clearTimeout(eco.timeout);
+  if(!eco.playing)return;
+  eco.playing=false;
+  $('#cue').className='cue'+(ok?'':' flash-fail');
+  eco.tries++;
+  if(ok){eco.hits++;eco.streak++;eco.best=Math.max(eco.best,eco.streak);setCue('¡Bien! Era '+cueTxt[eco.cue].toLowerCase()+'.');tone(880,.15);tone(1100,.15,0,'sine',.1)}
+  else{eco.streak=0;const msg=picked?'Pulsaste '+cueTxt[picked].toLowerCase()+', era '+cueTxt[eco.cue].toLowerCase()+'.':'Se acabó el tiempo, era '+cueTxt[eco.cue].toLowerCase()+'.';setCue(msg);tone(180,.3,0,'square')}
+  $('#ecoScore').textContent=`Aciertos ${eco.hits} / ${eco.tries}`;
+  $('#ecoStreak').textContent=eco.streak;$('#ecoBest').textContent=eco.best;
+  ecoSay('Prepárate para la siguiente señal…');
+  eco.timeout=setTimeout(()=>{if(document.getElementById('eco').hidden)return;eco.playing=true;ecoRound()},1100);
+}
+function ecoPick(choice){
+  if(!eco.playing)return;
+  ecoResult(choice===eco.cue,choice);
+}
+$('#ecoStart').addEventListener('click',()=>{eco.playing=true;ecoRound()});
+$('#ecoIzq').addEventListener('click',()=>ecoPick('izq'));
+$('#ecoDer').addEventListener('click',()=>ecoPick('der'));
+$('#ecoSalto').addEventListener('click',()=>ecoPick('saltar'));
+document.getElementById('eco').addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t&&(t.tagName==='INPUT'||(t.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))))return;
+  if(e.key==='ArrowLeft'){e.preventDefault();ecoPick('izq')}
+  else if(e.key==='ArrowRight'){e.preventDefault();ecoPick('der')}
+  else if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();ecoPick('saltar')}
+});
+$('#ecoReset').addEventListener('click',()=>{
+  clearTimeout(eco.timeout);eco.playing=false;eco.hits=0;eco.tries=0;eco.streak=0;eco.best=0;
+  $('#ecoScore').textContent='Aciertos 0 / 0';$('#ecoStreak').textContent='0';$('#ecoBest').textContent='0';
+  $('#cue').className='cue';setCue('Pulsa "Empezar" cuando estés listo.');$('#ecoStatus').textContent='';
+  $('#ecoTimer').classList.remove('run');$('#ecoTimer').style.transition='none';$('#ecoTimer').style.width='100%';
+});
+/* juego Ritmo Visual: memoria + vibración (sin depender del color ni del audio) */
+const RPADS=[['■','Cuadrado'],['●','Círculo'],['▲','Triángulo'],['★','Estrella']];
+$('#ritmoPad').innerHTML=RPADS.map(([g,n],i)=>`<button type="button" class="rpad" data-r="${i}" aria-label="${n}, tecla ${i+1}"><span class="glyph" aria-hidden="true">${g}</span><span class="rname">${n}</span></button>`).join('');
+const ritmo={seq:[],step:0,level:0,mode:'idle',t1:0,t2:0};
+function buzz(p){if(navigator.vibrate)try{navigator.vibrate(p)}catch(e){}}
+function ritmoSay(t){$('#ritmoStatus').textContent=t;speak(t)}
+function rpadEls(){return $$('#ritmoPad .rpad')}
+function rflash(i,on){const el=rpadEls()[i];if(el)el.classList.toggle('on',on)}
+function ritmoScore(){$('#ritmoScore').textContent='Nivel '+ritmo.level+' · Paso '+ritmo.step+' / '+ritmo.seq.length}
+function ritmoShow(){
+  ritmo.mode='show';ritmo.step=0;ritmoScore();
+  ritmoSay('Mira la secuencia.');
+  let k=0;
+  const next=()=>{
+    if(ritmo.mode!=='show')return;
+    if(k>=ritmo.seq.length){ritmo.mode='input';ritmoScore();ritmoSay('Tu turno: repite la secuencia.');return}
+    const i=ritmo.seq[k++];
+    rflash(i,true);buzz(30);tone(300+i*110,.16,0,'sine');
+    clearTimeout(ritmo.t1);clearTimeout(ritmo.t2);
+    ritmo.t1=setTimeout(()=>rflash(i,false),300);
+    ritmo.t2=setTimeout(next,540);
+  };
+  clearTimeout(ritmo.t1);clearTimeout(ritmo.t2);
+  ritmo.t1=setTimeout(next,650);
+}
+function ritmoNext(){ritmo.level++;ritmo.seq.push(Math.floor(Math.random()*4));ritmoScore();ritmoShow()}
+function ritmoStart(){
+  clearTimeout(ritmo.t1);clearTimeout(ritmo.t2);
+  rpadEls().forEach(p=>p.classList.remove('on','bad','hit'));
+  rsel=0;rselShow();
+  ritmo.seq=[];ritmo.level=0;ritmo.step=0;ritmoNext();
+}
+function ritmoStop(){
+  clearTimeout(ritmo.t1);clearTimeout(ritmo.t2);clearTimeout(rHold);rHeld=false;ritmo.mode='idle';
+  rpadEls().forEach(p=>p.classList.remove('on','bad','hit','sel'));
+}
+onStop(ritmoStop);
+function ritmoPress(i){
+  if(ritmo.mode!=='input')return;
+  const el=rpadEls()[i];if(!el)return;
+  if(i===ritmo.seq[ritmo.step]){
+    el.classList.add('hit');buzz(25);tone(560+i*90,.12,0,'sine');
+    setTimeout(()=>el.classList.remove('hit'),200);
+    ritmo.step++;
+    if(ritmo.step>=ritmo.seq.length){
+      ritmo.mode='show';buzz([0,45,45,45]);
+      ritmoSay('¡Nivel '+ritmo.level+' completado!');
+      [660,880,1100].forEach((f,k)=>tone(f,.14,0,'sine',k*.1));
+      clearTimeout(ritmo.t2);ritmo.t2=setTimeout(ritmoNext,1000);
+    }
+    ritmoScore();
+  }else{
+    el.classList.add('bad');buzz([70,50,70]);tone(170,.3,0,'square');
+    setTimeout(()=>el.classList.remove('bad'),500);
+    ritmo.mode='show';
+    ritmoSay('Fallaste en el paso '+(ritmo.step+1)+'. Mira otra vez.');
+    clearTimeout(ritmo.t2);ritmo.t2=setTimeout(()=>{ritmo.step=0;ritmoShow()},1300);
+  }
+}
+$('#ritmoPad').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(b)ritmoPress(+b.dataset.r)});
+$('#ritmoPad').addEventListener('keydown',e=>{
+  const i={'1':0,'2':1,'3':2,'4':3}[e.key];
+  if(i===undefined)return;
+  e.preventDefault();ritmoPress(i);
+});
+$('#ritmoStart').addEventListener('click',ritmoStart);
+/* modo 1 botón: toque = siguiente pad, mantener = elegir */
+let rsel=0,rHold=0,rHeld=false;
+function rselShow(){rpadEls().forEach((p,i)=>p.classList.toggle('sel',i===rsel))}
+function rselMove(){rsel=(rsel+1)%4;rselShow();buzz(15);tone(330+rsel*90,.08,0,'sine');ritmoSay('Pad '+RPADS[rsel][1]+'. Mantén para elegir.')}
+function rselStart(){rHeld=true;clearTimeout(rHold);rHold=setTimeout(()=>{rHeld=false;ritmoPress(rsel)},600)}
+function rselEnd(){if(!rHeld)return;rHeld=false;clearTimeout(rHold);rselMove()}
+(function(){
+  const b=$('#ritmoOne');
+  b.addEventListener('pointerdown',e=>{e.preventDefault();rselStart()});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,rselEnd));
+  b.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key===' '||e.key==='Enter'){e.preventDefault();rselStart()}});
+  b.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')rselEnd()});
+})();
+
+/* juego Caza del Sonido: localización espacial */
+const cazaStage=$('#cazaStage');
+let cobjs=[],cpos={x:12,y:72},cfound=0,cazaT=0;
+const cdist=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*.625);
+const cleft=()=>cobjs.filter(o=>!o.found);
+function cnext(){const r=cleft();return r.length?r.reduce((a,b)=>cdist(cpos,a)<=cdist(cpos,b)?a:b):null}
+function cwhere(t){
+  const dx=t.x-cpos.x,dy=t.y-cpos.y,p=[];
+  if(dy<-8)p.push('arriba');else if(dy>8)p.push('abajo');
+  if(dx>8)p.push('a la derecha');else if(dx<-8)p.push('a la izquierda');
+  return p.length?p.join(' y '):'muy cerca';
+}
+function cazaSay(t){$('#cazaStatus').textContent=t;speak(t)}
+function cazaScore(){$('#cazaScore').textContent='Objetos '+cfound+' / '+cobjs.length}
+function cbuild(){
+  cobjs=Array.from({length:5},(_,i)=>({id:i,x:22+Math.random()*66,y:16+Math.random()*64,found:false}));
+  cpos={x:12,y:72};cfound=0;
+  cazaStage.innerHTML=cobjs.map(o=>`<div class="caza-obj" id="co${o.id}" style="left:${o.x}%;top:${o.y}%"></div>`).join('')+
+    `<div class="radar" id="cazaRadar" aria-hidden="true"></div><div class="player" id="cpl" style="left:${cpos.x}%;top:${cpos.y}%"></div>`;
+  cazaScore();
+}
+function cping(){
+  const r=$('#cazaRadar');if(!r)return;
+  r.style.left=cpos.x+'%';r.style.top=cpos.y+'%';
+  r.classList.remove('ping');void r.offsetWidth;r.classList.add('ping');
+}
+function ctone(t){
+  const d=cdist(cpos,t);
+  tone(Math.max(280,920-Math.min(d,90)*7),.3,Math.max(-1,Math.min(1,(t.x-cpos.x)/40)),'triangle',0,Math.max(.05,.34-Math.min(d,90)*.0035));
+  return d;
+}
+function cmove(x,y){
+  cpos={x:Math.max(5,Math.min(95,x)),y:Math.max(8,Math.min(92,y))};
+  const p=$('#cpl');p.style.left=cpos.x+'%';p.style.top=cpos.y+'%';
+  cping();
+  clearTimeout(cazaT);cazaT=setTimeout(carrive,380);
+}
+function carrive(){
+  if(document.getElementById('caza').hidden)return;
+  const t=cnext();
+  if(!t){cazaSay('No quedan objetos. Pulsa Reiniciar para otra caza.');return}
+  const d=ctone(t);
+  if(d<8){
+    t.found=true;cfound++;
+    const el=$('#co'+t.id);if(el)el.classList.add('found');
+    cazaScore();tone(760,.12,0,'triangle');tone(1046,.2,0,'sine',.11);
+    const n=cnext();
+    if(n)cazaSay('¡Objeto '+cfound+' de '+cobjs.length+'! El siguiente está '+cwhere(n)+'.');
+    else{cazaSay('¡Caza completada! Encontraste los '+cobjs.length+' objetos.');[660,880,1174,1568].forEach((f,k)=>tone(f,.2,0,'sine',k*.12))}
+    return;
+  }
+  cazaSay('El objeto está '+(d<24?'cerca':'lejos')+', '+cwhere(t)+'.');
+}
+onStop(()=>clearTimeout(cazaT));
+cazaStage.addEventListener('pointerdown',e=>{
+  if(state.control!=='toque')return;
+  const r=cazaStage.getBoundingClientRect();
+  cmove((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100);
+});
+cazaStage.addEventListener('keydown',e=>{
+  if(state.control!=='toque')return;
+  const k={ArrowLeft:[-9,0],ArrowRight:[9,0],ArrowUp:[0,-12],ArrowDown:[0,12]}[e.key];
+  if(k){e.preventDefault();cmove(cpos.x+k[0],cpos.y+k[1])}
+});
+$('#cazaOne').addEventListener('click',()=>{
+  const t=cnext();
+  if(!t){cazaSay('No quedan objetos.');return}
+  const dx=t.x-cpos.x,dy=t.y-cpos.y,d=Math.hypot(dx,dy)||1;
+  cmove(cpos.x+dx/d*22,cpos.y+dy/d*16);
+});
+$('#cazaHint').addEventListener('click',()=>{
+  const t=cnext();
+  if(!t){cazaSay('No quedan objetos.');return}
+  if(state.audio){ctone(t);cazaSay('El siguiente objeto está '+cwhere(t)+'.')}
+  else cazaSay('Activa las pistas de sonido en Ajustes. Mientras tanto: el siguiente objeto está '+cwhere(t)+'.');
+});
+$('#cazaReset').addEventListener('click',()=>{cbuild();cazaSay('Caza reiniciada. Toca el escenario para empezar.')});
+cbuild();
+
+/* juego Un Botón, Un Mundo: un solo botón con gravedad */
+const BW={g:1000,jv:360,holdT:.3,gnd:41,heroW:34,obsW:18,ceil:72,goal:1140};
+const LEVELS=[
+  {sp:150,obs:[[430,26],[700,34],[960,30]]},
+  {sp:175,obs:[[360,30],[560,26],[760,38],[980,32]]},
+  {sp:200,obs:[[320,28],[470,34],[630,26],[820,40],[1000,32]]}
+];
+const bw={raf:0,last:0,run:false,x:0,y:0,vy:0,hold:false,ht:0,level:0,done:false,deadT:0,W:600};
+function bwSay(t){$('#botonStatus').textContent=t;speak(t)}
+function bwScore(){$('#botonScore').textContent='Nivel '+(bw.level+1)+' / '+LEVELS.length}
+function bwRender(){
+  const w=$('#botonWorld');
+  bw.W=w.clientWidth||bw.W;
+  $('#bhero').style.bottom=(BW.gnd+bw.y)+'px';
+  $('#botonTrack').style.transform='translateX('+(bw.W*.08-bw.x)+'px)';
+}
+function bwLevel(){
+  clearTimeout(bw.deadT);
+  const L=LEVELS[bw.level];
+  bw.x=0;bw.y=0;bw.vy=0;bw.hold=false;bw.ht=0;bw.done=false;
+  $('#bhero').classList.remove('dead','jump');
+  $('#botonTrack').innerHTML=L.obs.map(([x,h])=>`<div class="bobs" style="left:${x}px;height:${h}px"></div>`).join('')+
+    `<div class="bflag" style="left:${BW.goal}px"></div>`;
+  bwScore();bwRender();
+  bwSay('Nivel '+(bw.level+1)+' de '+LEVELS.length+'. Mantén pulsado para saltar.');
+  bw.run=true;bw.last=performance.now();
+  cancelAnimationFrame(bw.raf);bw.raf=requestAnimationFrame(bwLoop);
+}
+function bwHit(){
+  bw.run=false;cancelAnimationFrame(bw.raf);
+  $('#bhero').classList.add('dead');
+  tone(180,.3,0,'square');tone(140,.3,0,'square',.16);
+  bwSay('¡Chocaste! Reinicio del nivel '+(bw.level+1)+'.');
+  clearTimeout(bw.deadT);
+  bw.deadT=setTimeout(()=>{
+    if(document.getElementById('boton').hidden)return;
+    bwLevel();
+  },1200);
+}
+function bwWin(){
+  bw.run=false;cancelAnimationFrame(bw.raf);
+  [660,880,1174].forEach((f,k)=>tone(f,.18,0,'sine',k*.12));
+  if(bw.level>=LEVELS.length-1){
+    bw.done=true;
+    bwSay('¡Completaste los tres niveles con un solo botón! Pulsa para jugar otra vez.');
+    $('#bhero').classList.add('jump');
+    return;
+  }
+  bw.level++;
+  bwSay('Nivel superado. Viene el nivel '+(bw.level+1)+'.');
+  clearTimeout(bw.deadT);
+  bw.deadT=setTimeout(()=>{if(document.getElementById('boton').hidden)return;bwLevel()},1300);
+}
+function bwLoop(ts){
+  if(!bw.run)return;
+  const dt=Math.min(.034,(ts-bw.last)/1000||0);bw.last=ts;
+  const L=LEVELS[bw.level];
+  bw.x+=L.sp*dt;
+  if(bw.y>0||bw.vy>0){
+    let g=BW.g;
+    if(bw.hold&&bw.vy>0&&bw.ht<BW.holdT){g=BW.g*.5;bw.ht+=dt}
+    bw.vy-=g*dt;bw.y+=bw.vy*dt;
+    if(bw.y<=0){bw.y=0;bw.vy=0}
+    if(bw.y>BW.ceil){bw.y=BW.ceil;if(bw.vy>0)bw.vy=0}
+  }
+  const hc=bw.x+BW.heroW/2;
+  for(const [ox,oh] of L.obs){
+    if(Math.abs(ox-hc)<(BW.obsW+BW.heroW)/2-4&&bw.y<oh-2){bwHit();return}
+  }
+  if(bw.x>=BW.goal){bwWin();return}
+  bwRender();
+  bw.raf=requestAnimationFrame(bwLoop);
+}
+function jumpOn(){
+  if(document.getElementById('boton').hidden)return;
+  if(bw.done){bw.done=false;bw.level=0;bwLevel()}
+  else if(!bw.run){bwLevel()}
+  if(bw.y<=0.5){bw.vy=BW.jv;bw.ht=0;tone(520,.1,0,'sine');$('#bhero').classList.add('jump')}
+  bw.hold=true;
+}
+function jumpOff(){bw.hold=false;const h=$('#bhero');if(h&&!bw.done)h.classList.remove('jump')}
+onStop(()=>{bw.run=false;bw.hold=false;cancelAnimationFrame(bw.raf);clearTimeout(bw.deadT)});
+const jb=$('#botonJump');
+jb.addEventListener('pointerdown',e=>{e.preventDefault();jumpOn()});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>jb.addEventListener(ev,jumpOff));
+$('#botonWorld').addEventListener('pointerdown',e=>{e.preventDefault();jumpOn()});
+['pointerup','pointercancel'].forEach(ev=>window.addEventListener(ev,jumpOff));
+$('#botonReset').addEventListener('click',()=>{
+  clearTimeout(bw.deadT);bw.done=false;$('#bhero').classList.remove('dead','jump');bwLevel();
+});
+document.getElementById('boton').addEventListener('keydown',e=>{
+  if(e.repeat)return;
+  const t=e.target;
+  if(t&&t.tagName==='BUTTON'&&t.id!=='botonJump')return;
+  if(e.key===' '||e.key==='Enter'||e.key==='ArrowUp'){e.preventDefault();jumpOn()}
+});
+document.getElementById('boton').addEventListener('keyup',e=>{
+  if(e.key===' '||e.key==='Enter'||e.key==='ArrowUp')jumpOff();
+});
+
+guide();
+refresh();
+go(LOBBY);
+
+</script>
+</body>
+</html>
