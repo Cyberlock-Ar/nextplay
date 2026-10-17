@@ -206,6 +206,31 @@ html[data-sim="tritanopia"]{filter:url(#sim-tritanopia)}
 .bhero{position:absolute;left:8%;bottom:41px;width:34px;height:34px;border-radius:10px;background:#F4F6FA;border:3px solid #12151C;box-shadow:0 0 0 3px #F4F6FA;transition:background .15s}
 .bhero.jump{background:var(--guide)}
 .bhero.dead{background:#FF5A5F;box-shadow:0 0 0 3px #FF5A5F}
+/* pintura de patrones */
+.tex{position:relative;overflow:hidden}
+.tex::after{content:'';position:absolute;inset:0;pointer-events:none}
+.tex[data-p="0"]::after{background:repeating-linear-gradient(45deg,rgba(0,0,0,.7) 0 2px,transparent 2px 7px)}
+.tex[data-p="1"]::after{background:radial-gradient(rgba(0,0,0,.7) 28%,transparent 30%);background-size:7px 7px}
+.tex[data-p="2"]::after{background:repeating-linear-gradient(0deg,rgba(0,0,0,.7) 0 2px,transparent 2px 7px)}
+.tex[data-p="3"]::after{background:repeating-linear-gradient(90deg,rgba(0,0,0,.6) 0 2px,transparent 2px 7px),repeating-linear-gradient(0deg,rgba(0,0,0,.6) 0 2px,transparent 2px 7px)}
+.pinwrap{--c1:#3ED6B8;--c2:#FFB454;--c3:#5B9BD5;--c4:#FF5A7A;display:grid;gap:14px;max-width:620px;margin-top:4px}
+.pinwrap[data-mode="protanopia"]{--c1:#4C8DFF;--c2:#FFD23F;--c3:#2EC4B6;--c4:#B07CC6}
+.pinwrap[data-mode="deuteranopia"]{--c1:#5B9BD5;--c2:#F2C94C;--c3:#2EC4B6;--c4:#E4572E}
+.pinwrap[data-mode="tritanopia"]{--c1:#2EC4B6;--c2:#FFD23F;--c3:#4C8DFF;--c4:#FF5A7A}
+.pinpal{display:flex;flex-wrap:wrap;gap:8px}
+.psw{display:flex;align-items:center;gap:9px;min-height:48px;padding:0 13px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+.psw[aria-checked="true"]{border-color:var(--teal);background:var(--teal-soft);font-weight:600}
+.chip{width:24px;height:24px;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+.pinrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
+.pgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.pcell{position:relative;aspect-ratio:1;min-width:38px;min-height:38px;padding:0;border:1px dashed var(--line);border-radius:8px;background:var(--panel);cursor:pointer;overflow:hidden}
+.pcell[data-c]:not([data-c="-1"]){border-style:solid;border-color:rgba(0,0,0,.35)}
+.pcell.bad{outline:3px solid #FF5A5F;outline-offset:-3px}
+.pcell:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.pside{display:flex;flex-direction:column;gap:6px;align-items:center}
+.pside .pgrid{width:150px;gap:3px}
+.pside .pcell{min-width:0;min-height:0;border-width:1px;border-radius:5px;cursor:default;pointer-events:none}
+@media (max-width:700px){.pinrow{grid-template-columns:1fr}.pside{order:-1}.pside .pgrid{width:126px}}
 footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-size:13px}
 @media (max-width:700px){.hero{grid-template-columns:1fr}.hero-art{order:-1;justify-items:start}.hero-art img{max-width:170px}}
 @media (max-width:560px){.profile{width:100%;justify-content:flex-start}.qrow{padding:12px}.tile-icon{width:40px;height:40px;font-size:19px}.brand img{width:30px;height:30px}}
@@ -374,6 +399,36 @@ footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-siz
   <p class="status" id="botonStatus" role="status" aria-live="polite">Pulsa y mantén el botón para empezar a correr.</p>
 </section>
 
+<section id="pintura" hidden>
+  <div class="gbar">
+    <button class="btn" data-go="lobby">← Volver a juegos</button>
+    <div class="gtags"><span class="tag">Daltonismo</span><span class="tag">Motriz</span></div>
+  </div>
+  <h2>Pintura de Patrones</h2>
+  <p class="lead">Copia el patrón de la derecha: cada color tiene su propia <b>textura</b> (diagonal, puntos, rayas o cuadrícula), así que no dependes solo del tono. Toca las casillas o usa Tabulador y Intro.</p>
+  <div data-quick></div>
+  <div class="hud">
+    <div class="score" id="pinScore">Diseños 0 / 3</div>
+    <button class="btn" id="pinReset">Reiniciar</button>
+  </div>
+  <div class="pinwrap" data-mode="default">
+    <div class="pinpal" id="pinPal" role="radiogroup" aria-label="Paleta de texturas"></div>
+    <div class="pinrow">
+      <div class="pgrid" id="pinBoard" role="group" aria-label="Lienzo para pintar, 6 columnas por 5 filas"></div>
+      <div class="pside">
+        <span class="qlabel">Patrón a copiar</span>
+        <div class="pgrid" id="pinTarget" role="img"></div>
+      </div>
+    </div>
+  </div>
+  <div class="tools">
+    <button class="btn primary big" id="pinOne" hidden>Pintar la siguiente casilla</button>
+    <button class="btn" id="pinCheck">Comprobar</button>
+  </div>
+  <p class="rhint"><span>Flechas para moverte</span><span>Teclas 1-4 cambian de textura</span><span>Intro para pintar</span></p>
+  <p class="status" id="pinStatus" role="status" aria-live="polite">Elige una textura y empieza a pintar el lienzo.</p>
+</section>
+
 </main>
 
 <dialog id="ajustes" aria-labelledby="ajustesTitle">
@@ -422,8 +477,7 @@ const GAMES=[
  ['Un Botón, Un Mundo','Corredor con gravedad que se juega con un único botón: mantén pulsado para saltar.',['Motriz','Un botón'],'boton','#6B4E9B'],
  ['Ritmo Visual','Secuencias de pads que se distinguen por su forma, con luz y vibración en lugar de audio.',['Sordera','Hipoacusia'],'ritmo','#1F6F8B'],
  ['Caza del Sonido','Encuentra 5 objetos escondidos guiándote solo por el tono y su posición en el oído.',['Ceguera','Baja visión','Sonido'],'caza','#0A7C6A'],
- ['Laberinto de Voz','Guía al personaje por el laberinto con comandos de voz.',['Motriz','Voz'],false,'#8A3D5B'],
- ['Pintura de Patrones','Combina colores con texturas y formas, no solo con tonos.',['Daltonismo'],false,'#A8650A']];
+ ['Pintura de Patrones','Reproduce mosaicos combinando color, textura y forma: nunca dependes solo del tono.',['Daltonismo','Motriz'],'pintura','#A8650A']];
 // false = en diseño
 
 /* navegación */
@@ -434,7 +488,7 @@ function stopGames(){stopFns.forEach(f=>{try{f()}catch(e){}})}
 function go(id){
   stopGames();
   $$('main section').forEach(s=>s.hidden=s.id!==id);
-  const enJuegos=[LOBBY,'jugar','eco','ritmo','caza','boton'].includes(id);
+  const enJuegos=[LOBBY,'jugar','eco','ritmo','caza','boton','pintura'].includes(id);
   $$('nav [data-go]').forEach(b=>b.setAttribute('aria-current',(b.dataset.go===id||(b.dataset.go===LOBBY&&enJuegos))?'page':'false'));
   window.scrollTo(0,0);
 }
@@ -523,7 +577,7 @@ $$('[data-quick]').forEach((el,i)=>{el.innerHTML=quickHTML(i)});
 function refresh(){
   const simKey=state.sim?(state.mode==='default'?'protanopia':state.mode):'';
   if(simKey)document.documentElement.dataset.sim=simKey;else delete document.documentElement.dataset.sim;
-  $$('.stage,.bworld').forEach(s=>s.dataset.mode=state.sim?'default':state.mode);
+  $$('.stage,.bworld,.pinwrap').forEach(s=>s.dataset.mode=state.sim?'default':state.mode);
   $$('.opt[data-mode],.qopt[data-mode]').forEach(b=>b.setAttribute('aria-checked',b.dataset.mode===state.mode));
   $$('.opt[data-control],.qopt[data-control]').forEach(b=>b.setAttribute('aria-checked',b.dataset.control===state.control));
   $$('.sw-audio').forEach(b=>b.setAttribute('aria-checked',state.audio));
@@ -533,6 +587,7 @@ function refresh(){
   $('#oneBtn').hidden=state.control!=='boton';
   const c1=$('#cazaOne');if(c1)c1.hidden=state.control!=='boton';
   const r1=$('#ritmoOne');if(r1)r1.hidden=state.control!=='boton';
+  const p1=$('#pinOne');if(p1)p1.hidden=state.control!=='boton';
   const m=MODES.find(x=>x[0]===state.mode)[1];
   $('#profileTxt').innerHTML=`<b>${m}</b> · ${state.audio?'con sonido':'sin sonido'} · ${state.voice?'con voz':'sin voz'}${state.sim?' · demo':''}`;
 }
@@ -968,6 +1023,121 @@ document.getElementById('boton').addEventListener('keydown',e=>{
 document.getElementById('boton').addEventListener('keyup',e=>{
   if(e.key===' '||e.key==='Enter'||e.key==='ArrowUp')jumpOff();
 });
+
+/* juego Pintura de Patrones: color + textura + forma */
+const DESIGNS=[
+  ['00--00','000000','000000','-0000-','--00--'],
+  ['--33--','-3333-','333333','220022','220022'],
+  ['121212','212121','121212','212121','121212']
+];
+const DNAME=['corazón','casa','damero'];
+const PCOLS=['diagonal','puntos','rayas','cuadrícula'];
+const pint={sel:0,board:[],lvl:0,done:0,won:false,bT:0,nextT:0};
+function pinSay(t){$('#pinStatus').textContent=t;speak(t)}
+function pinScore(){$('#pinScore').textContent='Diseños '+pint.done+' / '+DESIGNS.length}
+function pinTarget(){return DESIGNS[pint.lvl].join('').split('').map(c=>c==='-'?-1:+c)}
+function pinLabel(i,v){return 'Fila '+(Math.floor(i/6)+1)+', columna '+(i%6+1)+': '+(v<0?'sin pintar':PCOLS[v])}
+function pinRender(){
+  const t=pinTarget();
+  const rows=[0,1,2,3,4].map(r=>t.slice(r*6,r*6+6).map(v=>v<0?'vacío':PCOLS[v]).join(', '));
+  const tgt=$('#pinTarget');
+  tgt.innerHTML=t.map(v=>`<div class="pcell tex" data-c="${v}"${v<0?'':` data-p="${v}" style="background:var(--c${v+1})"`}></div>`).join('');
+  tgt.setAttribute('aria-label','Patrón a copiar. '+rows.map((x,r)=>'Fila '+(r+1)+': '+x).join('. '));
+  $('#pinBoard').innerHTML=t.map((tv,i)=>{
+    const v=pint.board[i];
+    return `<button type="button" class="pcell tex" data-i="${i}" data-c="${v}"${v<0?'':` data-p="${v}" style="background:var(--c${v+1})"`} aria-label="${pinLabel(i,v)}"></button>`;
+  }).join('');
+}
+function pinSet(i,v){
+  pint.board[i]=v;
+  const el=$$('#pinBoard .pcell')[i];
+  if(!el)return;
+  el.dataset.c=v;
+  if(v<0){el.removeAttribute('data-p');el.style.background=''}
+  else{el.dataset.p=v;el.style.background='var(--c'+(v+1)+')'}
+  el.setAttribute('aria-label',pinLabel(i,v));
+}
+function pinPos(i){return 'casilla '+(Math.floor(i/6)+1)+','+(i%6+1)}
+function pinWin(){
+  if(pint.won)return false;
+  const t=pinTarget();
+  if(!pint.board.every((v,i)=>v===t[i]))return false;
+  pint.won=true;pint.done++;pinScore();buzz([0,45,45,45]);
+  [660,880,1100].forEach((f,k)=>tone(f,.14,0,'sine',k*.1));
+  if(pint.done>=DESIGNS.length){pinSay('¡Completaste los '+DESIGNS.length+' diseños! Pulsa Reiniciar para pintar otra vez.');return true}
+  pinSay('¡Diseño del '+DNAME[pint.lvl]+' completado! Viene el '+DNAME[pint.lvl+1]+'.');
+  pint.lvl++;
+  clearTimeout(pint.nextT);
+  pint.nextT=setTimeout(()=>{
+    if(document.getElementById('pintura').hidden)return;
+    pint.won=false;pint.board=Array(30).fill(-1);pinRender();pinScore();
+    pinSay('Nuevo diseño: '+DNAME[pint.lvl]+'. Copia el patrón de la derecha.');
+  },1400);
+  return true;
+}
+function pinClick(i){
+  if(pint.board[i]===pint.sel){pinSay('Esa casilla ya tiene textura '+PCOLS[pint.sel]+'.');return}
+  pinSet(i,pint.sel);buzz(20);tone(380+pint.sel*100,.1,0,'sine');
+  pinSay(pinPos(i)+' pintada con textura '+PCOLS[pint.sel]+'.');
+  pinWin();
+}
+function pinCheck(){
+  const t=pinTarget();
+  const cells=$$('#pinBoard .pcell');
+  let bad=0;
+  cells.forEach((el,i)=>{
+    const ok=pint.board[i]===t[i];
+    el.classList.toggle('bad',!ok);
+    if(!ok)bad++;
+  });
+  clearTimeout(pint.bT);
+  pint.bT=setTimeout(()=>cells.forEach(el=>el.classList.remove('bad')),1700);
+  if(!bad){pinWin();return}
+  tone(170,.3,0,'square');
+  pinSay('Faltan '+bad+' casillas: las marcadas en rojo no coinciden con el patrón.');
+}
+function pinNext(){
+  const t=pinTarget();
+  const i=pint.board.findIndex((v,k)=>v!==t[k]);
+  if(i<0){pinCheck();return}
+  pinSet(i,t[i]);buzz(25);tone(460,.1,0,'sine');
+  pinSay(pinPos(i)+' pintada.');
+  pinWin();
+}
+function pinSel(i){
+  pint.sel=i;
+  $$('#pinPal .psw').forEach((b,k)=>b.setAttribute('aria-checked',k===i));
+  tone(420+i*90,.09,0,'sine');
+  pinSay('Textura '+PCOLS[i]+'.');
+}
+$('#pinPal').innerHTML=PCOLS.map((n,i)=>`<button type="button" class="psw" role="radio" data-sel="${i}" aria-checked="${i===0}"><span class="chip tex" data-p="${i}" aria-hidden="true" style="background:var(--c${i+1})"></span>${n[0].toUpperCase()+n.slice(1)}<span class="qlabel">tecla ${i+1}</span></button>`).join('');
+$('#pinPal').addEventListener('click',e=>{const b=e.target.closest('.psw');if(b)pinSel(+b.dataset.sel)});
+$('#pinBoard').addEventListener('click',e=>{const b=e.target.closest('.pcell');if(b)pinClick(+b.dataset.i)});
+$('#pinBoard').addEventListener('keydown',e=>{
+  const b=e.target.closest('.pcell');if(!b)return;
+  const d={ArrowRight:1,ArrowLeft:-1,ArrowDown:6,ArrowUp:-6}[e.key];
+  if(d===undefined)return;
+  e.preventDefault();
+  const n=Math.max(0,Math.min(29,+b.dataset.i+d));
+  $$('#pinBoard .pcell')[n].focus();
+});
+document.getElementById('pintura').addEventListener('keydown',e=>{
+  const n={'1':0,'2':1,'3':2,'4':3}[e.key];
+  if(n===undefined)return;
+  e.preventDefault();pinSel(n);
+});
+$('#pinCheck').addEventListener('click',pinCheck);
+$('#pinOne').addEventListener('click',pinNext);
+$('#pinReset').addEventListener('click',()=>{
+  clearTimeout(pint.nextT);clearTimeout(pint.bT);
+  pint.done=0;pint.lvl=0;pint.won=false;pint.board=Array(30).fill(-1);
+  $$('#pinPal .psw').forEach((b,k)=>b.setAttribute('aria-checked',k===0));pint.sel=0;
+  pinRender();pinScore();
+  pinSay('Pintura reiniciada. Elige una textura y toca las casillas.');
+});
+onStop(()=>{clearTimeout(pint.nextT);clearTimeout(pint.bT);});
+pint.board=Array(30).fill(-1);
+pinRender();pinScore();
 
 guide();
 refresh();
