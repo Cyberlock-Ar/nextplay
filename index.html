@@ -75,6 +75,16 @@ section{padding:36px 0 56px}
 .facts[open] summary::before{content:'–'}
 .facts ul{margin:6px 0 8px;padding-left:6px;display:flex;flex-direction:column;gap:7px;color:var(--dim);font-size:13px;list-style:none}
 .facts b{color:var(--text)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px 10px;padding:8px 0 6px}
+.fd{margin:0;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.fring{position:relative;width:78px;height:78px}
+.fring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.fring .dtrack{stroke:var(--line)}
+.fring .dfill{stroke:var(--teal);stroke-linecap:round;animation:donutIn 1.2s ease-out both}
+.fring .dfill.amber{stroke:var(--amber)}
+.fring b{position:absolute;inset:0;display:grid;place-items:center;font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--text)}
+.fd figcaption{font-size:11.5px;color:var(--text);line-height:1.35;font-weight:500}
+.fd figcaption span{display:block;font-weight:400;font-size:10.5px;color:var(--dim)}
 
 /* catalogo */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:26px}
@@ -242,7 +252,7 @@ footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-siz
 @media (max-width:700px){.hero{grid-template-columns:1fr}.hero-art{order:-1;justify-items:start}.hero-art img{max-width:170px}}
 @media (max-width:560px){.profile{width:100%;justify-content:flex-start}.qrow{padding:12px}.tile-icon{width:40px;height:40px;font-size:19px}.brand img{width:30px;height:30px}}
 @media (prefers-reduced-motion:reduce){.player,.coin,.switch::after,.beacon{transition:none}.wave i{animation:none;height:50%}.wave.err i{height:12%}.coin.target,.goal.target{animation:none}.brand img{animation:none}.hero-art img{animation:none;opacity:.75}}
-@media (prefers-reduced-motion:reduce){.rpad,.bhero,.caza-obj{transition:none}.radar.ping{animation:none}.card{transition:none}.hero-art img{animation:none;opacity:.75}.donut .dfill,.sbar i::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.rpad,.bhero,.caza-obj{transition:none}.radar.ping{animation:none}.card{transition:none}.hero-art img{animation:none;opacity:.75}.donut .dfill,.sbar i::after,.fring .dfill{animation:none}}
 </style>
 </head>
 <body>
@@ -282,13 +292,32 @@ footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-siz
       <p class="stat-src">Dificultades más frecuentes sobre personas con discapacidad. Fuente: DANE, CNPV 2018 y ECV.</p>
       <details class="facts">
         <summary>Más datos de interés</summary>
-        <ul>
-          <li><b>1 de cada 6</b> personas en el mundo tiene una discapacidad importante: 1.300 millones (OMS, 2023).</li>
-          <li><b>1 de cada 12 hombres</b> tiene daltonismo; en mujeres es 1 de cada 200 (NIH).</li>
-          <li>En Colombia, <b>55%</b> de las personas con discapacidad son mujeres y cerca del 45% son mayores de 60 años (DANE, ECV).</li>
-          <li>El <b>81%</b> de los jugadores considera importante que los juegos tengan opciones de accesibilidad (Google, 2025).</li>
-          <li>El <b>66%</b> de los jugadores con discapacidad encuentra barreras al jugar (Scope, 2020).</li>
-        </ul>
+        <div class="fgrid">
+          <figure class="fd" role="img" aria-label="16 por ciento: 1 de cada 6 personas en el mundo tiene una discapacidad importante. OMS, 2023.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:16 84"></circle></svg><b>16%</b></span>
+            <figcaption>1 de cada 6 en el mundo<span>OMS, 2023</span></figcaption>
+          </figure>
+          <figure class="fd" role="img" aria-label="8 por ciento de hombres tiene daltonismo, 1 de cada 12. NIH.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:8 92"></circle></svg><b>8%</b></span>
+            <figcaption>Hombres con daltonismo<span>1 de cada 12 · NIH</span></figcaption>
+          </figure>
+          <figure class="fd" role="img" aria-label="0,5 por ciento de mujeres tiene daltonismo. NIH.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:.5 99.5"></circle></svg><b>0,5%</b></span>
+            <figcaption>Mujeres con daltonismo<span>NIH</span></figcaption>
+          </figure>
+          <figure class="fd" role="img" aria-label="55 por ciento de las personas con discapacidad en Colombia son mujeres. DANE, ECV.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:55 45"></circle></svg><b>55%</b></span>
+            <figcaption>Mujeres con discapacidad en Colombia<span>DANE, ECV</span></figcaption>
+          </figure>
+          <figure class="fd" role="img" aria-label="81 por ciento de los jugadores considera importante la accesibilidad en los juegos. Google, 2025.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:81 19"></circle></svg><b>81%</b></span>
+            <figcaption>Jugadores que valoran la accesibilidad<span>Google, 2025</span></figcaption>
+          </figure>
+          <figure class="fd" role="img" aria-label="66 por ciento de los jugadores con discapacidad encuentra barreras al jugar. Scope, 2020.">
+            <span class="fring"><svg viewBox="0 0 42 42" aria-hidden="true"><circle class="dtrack" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5"></circle><circle class="dfill amber" cx="21" cy="21" r="15.9155" fill="none" stroke-width="5" style="stroke-dasharray:66 34"></circle></svg><b>66%</b></span>
+            <figcaption>Gamers con discapacidad que encuentran barreras<span>Scope, 2020</span></figcaption>
+          </figure>
+        </div>
       </details>
     </div>
     <div class="hero-art"><img src="logo.png" alt="" width="300" height="300" decoding="async"></div>
