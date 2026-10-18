@@ -50,12 +50,9 @@ section{padding:36px 0 56px}
 .btn.primary{background:var(--teal);border-color:var(--teal);color:var(--on-teal)}
 
 /* lobby */
-.hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,320px);gap:18px 28px;align-items:center;border:1px solid var(--line);border-radius:18px;overflow:hidden;padding:24px 26px 26px}
+.hero{position:relative;isolation:isolate;display:grid;gap:18px;align-items:center;border:1px solid var(--line);border-radius:18px;overflow:hidden;padding:24px 26px 26px}
 .hero::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(var(--hero-veil),var(--hero-veil)),url('hero-bg.jpg') center 30%/cover no-repeat}
 .hero .lead{color:var(--text)}
-.hero-art{display:grid;place-items:center;padding:4px}
-.hero-art img{width:100%;max-width:300px;height:auto;opacity:.55;animation:heroGlow 3.2s ease-in-out infinite}
-@keyframes heroGlow{0%,100%{opacity:.5;filter:drop-shadow(0 0 10px rgba(62,214,184,.2))}50%{opacity:1;filter:drop-shadow(0 0 36px rgba(62,214,184,.8))}}
 #lobby h1{font-size:clamp(34px,7vw,56px);line-height:1.05}
 .stat{margin:14px 0 0;color:var(--dim);font-size:13px}
 .statcard{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);max-width:640px}
@@ -260,10 +257,10 @@ html[data-sim="tritanopia"]{filter:url(#sim-tritanopia)}
 .pside .pcell{min-width:0;min-height:0;border-width:1px;border-radius:5px;cursor:default;pointer-events:none}
 @media (max-width:700px){.pinrow{grid-template-columns:1fr}.pside{order:-1}.pside .pgrid{width:126px}}
 footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-size:13px}
-@media (max-width:700px){.hero{grid-template-columns:1fr;padding:18px 16px 20px}.hero-art{order:-1;justify-items:start}.hero-art img{max-width:170px}}
+@media (max-width:700px){.hero{padding:18px 16px 20px}}
 @media (max-width:560px){.profile{width:100%;justify-content:flex-start}.qrow{padding:12px}.tile-icon{width:40px;height:40px;font-size:19px}.brand img{width:30px;height:30px}}
-@media (prefers-reduced-motion:reduce){.player,.coin,.switch::after,.beacon{transition:none}.wave i{animation:none;height:50%}.wave.err i{height:12%}.coin.target,.goal.target{animation:none}.brand img{animation:none}.hero-art img{animation:none;opacity:.75}}
-@media (prefers-reduced-motion:reduce){.rpad,.bhero,.caza-obj{transition:none}.radar.ping{animation:none}.card{transition:none}.hero-art img{animation:none;opacity:.75}.donut .dfill,.sbar i::after,.fring .dfill{animation:none}}
+@media (prefers-reduced-motion:reduce){.player,.coin,.switch::after,.beacon{transition:none}.wave i{animation:none;height:50%}.wave.err i{height:12%}.coin.target,.goal.target{animation:none}.brand img{animation:none}}
+@media (prefers-reduced-motion:reduce){.rpad,.bhero,.caza-obj{transition:none}.radar.ping{animation:none}.card{transition:none}.donut .dfill,.sbar i::after,.fring .dfill{animation:none}}
 </style>
 </head>
 <body>
@@ -331,7 +328,6 @@ footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-siz
         </div>
       </details>
     </div>
-    <div class="hero-art"><img src="logo.png" alt="" width="300" height="300" decoding="async"></div>
   </div>
   <div class="grid" id="grid"></div>
   <p class="status" id="catStatus" role="status" aria-live="polite"></p>
