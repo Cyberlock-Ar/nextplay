@@ -85,6 +85,12 @@ section{padding:36px 0 56px}
 .fring b{position:absolute;inset:0;display:grid;place-items:center;font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--text)}
 .fd figcaption{font-size:11.5px;color:var(--text);line-height:1.35;font-weight:500}
 .fd figcaption span{display:block;font-weight:400;font-size:10.5px;color:var(--dim)}
+.credits-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.cred-lab{color:var(--text);font-weight:600}
+.credits{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none;align-items:center}
+.credits li{display:flex;align-items:center;gap:8px}
+.credits img,.ci{width:26px;height:26px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px var(--line);flex:0 0 auto}
+.ci{display:grid;place-items:center;background:var(--teal);color:var(--on-teal);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700}
 
 /* catalogo */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:26px}
@@ -498,7 +504,15 @@ footer{border-top:1px solid var(--line);padding:18px 0;color:var(--dim);font-siz
       <button class="switch sw-sim" data-toggle="sim" role="switch" aria-checked="false" aria-label="Simular daltonismo en toda la página"></button></div></div>
   </div>
 </dialog>
-<footer><div class="wrap">Desarrollado por: Cyberlock · EMORY · b15 · Hardboiledvoid</div></footer>
+<footer><div class="wrap credits-row">
+  <span class="cred-lab">Desarrollado por:</span>
+  <ul class="credits">
+    <li><img src="cyberlock.png" alt="" data-i="C" onerror="this.replaceWith(Object.assign(document.createElement('b'),{className:'ci',textContent:this.dataset.i}))"><span>Cyberlock</span></li>
+    <li><img src="emory.png" alt="" data-i="E" onerror="this.replaceWith(Object.assign(document.createElement('b'),{className:'ci',textContent:this.dataset.i}))"><span>EMORY</span></li>
+    <li><img src="b15.png" alt="" data-i="B" onerror="this.replaceWith(Object.assign(document.createElement('b'),{className:'ci',textContent:this.dataset.i}))"><span>b15</span></li>
+    <li><img src="hardboiledvoid.png" alt="" data-i="H" onerror="this.replaceWith(Object.assign(document.createElement('b'),{className:'ci',textContent:this.dataset.i}))"><span>Hardboiledvoid</span></li>
+  </ul>
+</div></footer>
 
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
   <filter id="sim-protanopia" color-interpolation-filters="linearRGB">
